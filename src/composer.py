@@ -28,7 +28,7 @@ from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email.MIMEText import MIMEText
 from email import Encoders, message_from_file
-from emailAccount import Account
+from emailAccount import EmailAccount
 import pickle
 import sendMail
 
@@ -64,7 +64,7 @@ class Composer(Toplevel):
 
 		self.addressBox = Listbox(self)
 		self.addressBox.pack(side=TOP, fill=X)
-		self
+
 		
 		self.subjectBox = Entry(self)
 		self.subjectBox.pack(side=TOP, fill=X)
@@ -74,7 +74,6 @@ class Composer(Toplevel):
 
 		self.filemenu = Menu(self.menubar)
 		self.filemenu.add_command(label = "Save", command = self.save_mail)
-		self.filemenu.add_command(label = "Exit", command = self.master.quit)
 
 		self.menubar.add_cascade(label = "File", menu = self.filemenu)
 		self.config(menu = self.menubar)
@@ -153,3 +152,4 @@ if __name__ == '__main__':
 	root = Tk()
 	app = Composer(root)
 	root.mainloop()
+

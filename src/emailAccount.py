@@ -24,9 +24,11 @@ import tkSimpleDialog
 import tkFileDialog
 import pickle
 import os
-import sendMail
+import account
 
-class Account(object):
+
+
+class EmailAccount(account.Account):
 		
 	def __init__(self, email, type, in_server, in_port, out_server, out_port):
 		self.in_server = in_server
@@ -36,24 +38,12 @@ class Account(object):
 		self.email = email
 		self.type = type
 		self.name = os.path.relpath(tkFileDialog.asksaveasfilename(title = "Save as.."))
-		self.mboxDir = os.path.splitext(self.name)[0] + ".mail"	
+		self.mboxDir = os.path.splitext(self.name)[0] + "Mail"	
 		
 		self.save()
-	def save(self):
-		#save account for later loading
-		pickle.dump(self, open(self.name, "w"))
+	
 
-
-def attach_inbox (account):
-        inbox = sendMail.Inbox(account)
-        return inbox
-
-class AccountError(Exception):
-	def __init__(self, error):
-		self.value = error
-
-
-class NewAccountDialog(tkSimpleDialog.Dialog):
+class EmailAccountDialog(tkSimpleDialog.Dialog):
 	
 	def body(self, master):
 		self.control = StringVar()
@@ -97,15 +87,29 @@ class NewAccountDialog(tkSimpleDialog.Dialog):
 		self.result = 1
 
 
-def new(master):
-	loadedAccount = None
-
-	popup = NewAccountDialog(master, 'New Email Account')
+class EmailAccountManager(account.AccountManager):
+	def __init__(self, master, configfile = 'AccountConfig.ini'):
+		self.master = master
+		account.AccountManager.__init__(self, configfile)
 	
-	x = Account(popup.email, popup.type, popup.server, popup.port, popup.smtp_server, popup.smtp_port)
-	return x
-
-if __name__ == "__main__":
-	
+	def new_account (self, default = False):
+		""" Creates a new email account. """
+		if self.currentAccount:
+			self.currentAccount.save()
+		popup = EmailAccountDialog(self.master, 'New Email Account')		
+		self.currentAccount = EmailAccount(popup.email, popup.type, popup.server, popup.port, popup.smtp_server, popup.smtp_port)
+		if default:
+			self.set_as_default()
+			
+	def fix_config_file (self):
+		""" asks for a file to load. If there is no file, it makes a new one. """
+		tkMessageBox.showwarning(
+			'Oh, no!', 
+			"""There seems to be a problem with the configuration file and I can't load the default account.
+			 Don't worry, though, just choose the correct account you want to be default.""")
+		tkFileDialog.askopenfilename(title = "Open account file...")
+			
+if __name__ == "__main__":	
 	root = Tk()
-	new()
+	manager = EmailAccountManager(root)
+
