@@ -1,22 +1,12 @@
-
-
-#TODO: make loading file, and finish prompts for version 0.1
-#TODO: turn current frame work to the compsition frame. Use Toplevel.
-from Tkinter import *
-from ttk import *
-import mainWindow
-
-class Frequency:
-	def __init__(self, master):
-		s = Style()
-		print s.theme_names()
-		s.theme_use('xpnative')
-		start = mainWindow.MainWindow(master)
-		
-
-
-
+def main(toolkit):
+	if toolkit == 'tk':
+		import gui.tk.mainWindow as mainWin
+	elif toolkit == 'wx':
+		import gui.wxgui.mainWindow as mainWin
+	elif toolkit == 'gtk':
+		import gui.gtk.mainWindow as mainWin
+	
+	mainWin.start()
+	
 if __name__ == "__main__":
-	root = Tk()
-	frequency = Frequency(root)
-	root.mainloop()
+	main('wx')

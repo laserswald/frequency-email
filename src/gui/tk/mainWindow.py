@@ -21,11 +21,11 @@
 from Tkinter import * 
 from toolbar import *
 from statusbar import *
-import sendMail
+from logic import sendMail, emailAccount
+from logic.mainLogic import MainWindowLogic as mainLogic
 from composer import Composer
 import tkSimpleDialog
-import ConfigParser, tkFileDialog, pickle, emailAccount
-import emailAccount
+import ConfigParser, tkFileDialog, pickle
 
 class MainWindow(Frame):
 	
@@ -55,8 +55,8 @@ class MainWindow(Frame):
 		self.status.pack(side = BOTTOM, fill = X)
 
 		self.tbbuttons =[
-							["Send", self.send_mail],
-							['Write', self.compose],
+							["Send", mainLogic.send],
+							['Write', mainLogic.compose],
 						]
 		self.toolbar = Toolbar(self.master, self.tbbuttons)
 		self.toolbar.pack(side=TOP, fill=X)
@@ -75,14 +75,10 @@ class MainWindow(Frame):
 		self.panes.pack(side=TOP, fill=BOTH, expand=1)
 		self.status.set("Welcome to Frequency!")
 		
-	def send_mail(self): #Main mail driver.
-		password = tkSimpleDialog.askstring("Password?", "Please give your email's password.", show = '*')
-		try:
-			self.outbox.send_all(password)
-			self.status.set("All mail sent!")
-		except:
-			self.status.set("Mail sending failed.")				
-		
+	def getmail(self):
+		boxname = self.mailboxTree.selection()[0]
+	
+	
 	def compose (self):
 		""" Launches the composer. """
 		try:
@@ -96,9 +92,9 @@ class MainWindow(Frame):
 		""" sets up the Account management class. """
 		self.acctManager = emailAccount.EmailAccountManager(self.master)
 		
-		
-if __name__ == '__main__':
+def start():	
 	app = Tk()
 	win = MainWindow(app)
-	app.mainloop()
+	app.mainloop()		
+
 

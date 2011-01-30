@@ -1,12 +1,7 @@
 import Tkinter
 from Tkinter import *
-from ttk import *
+
 class Toolbar(Frame):
-	"""
-	A class for easily making toolbars. It is a frame with a raised relief and 
-	a list of buttons in the form of 
-	[[name, callback]] is passed, automatically making buttons with those attributes.
-	"""
 	buttons = []
 	def __init__(self, master, buttons = None):
 		Frame.__init__(self, master, borderwidth=2, relief='raised')

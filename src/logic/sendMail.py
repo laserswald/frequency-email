@@ -24,39 +24,74 @@ import smtplib
 import poplib
 import imaplib
 import mailbox
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email.MIMEText import MIMEText
-from email import Encoders
-import os
+import tkSimpleDialog
+from ttk import Label, Progressbar
+import tkMessageBox
+
+
+	
+
+class SubMailBox:
+	pass
 
 class Inbox(mailbox.Maildir):
 	"""
 	This class represents a maildir mailbox with convenience functions for getting mail.
 	"""
+	total = 0
+	loaded = 0
 
-	def __init__(self, account):
+	def __init__(self, account, master):
 		"""
 		Constructor.
 		
 		account -- An account to bind this mailbox to.
 		"""
 		self._account = account
-		mailbox.Maildir.__init__(self._account.mboxDir, factory = mailbox.MaildirMessage)
+		mailbox.Maildir.__init__(self, self._account.mboxDir, factory = mailbox.MaildirMessage)
 
-	def retrieve_mail(self):
+	def retrieve_mailboxes(self):
 		"""
-		Retrieving of emails and placing them into the maildir.
+		Retrieves mailboxes and returns a list of them.
 		"""
+		self.mailboxes = []
 		if self._account.type == "POP":
-			server = poplib.POP3(self._account.in_server, self._account.in_port)
+			self.server = poplib.POP3(self._account.in_server, self._account.in_port)
 			
 		if self._account.type == "IMAP":
-			server = imaplib.IMAP4_SSL(self._account.in_server, self._account.in_port)
-			mboxes = server.list()
-			print mboxes
-			
+			self.server = imaplib.IMAP4_SSL(self._account.in_server, int(self._account.in_port))
+			while True:
+				password = tkSimpleDialog.askstring("Password?", "Please give your email's password.", show = '*')
+				try:
+					self.server.login(self._account.email, password)
+					break
+				except:
+					tkMessageBox.showerror('Oh, poopy.', 'Apparently, you screwed up your password. Try again.')
+			status, self.mailboxraw = self.server.list()
+			for box in self.mailboxraw:				
+				self.mailboxes.append(box.split('" "')[1].strip('"'))
+		return self.mailboxes
+	
+	def retrieve_mail(self, mailbox = 'INBOX', what = 'ALL'):
+		currentBox = self.get_folder(mailbox)
+		
+		self.server.select(mailbox)
+		typ, data = self.server.search(None, what)
 
+		self.total = len(data[0].split())
+		self.progressbar.config(maximum = self.total)
+		loaded = 0
+		for num in data[0].split():
+			typ, data = self.server.fetch(num, '(RFC822)')
+			currentBox.add(data[0][1])
+			loaded += 1
+			self.progressbar.config(value = loaded)
+			
+			print 'Progress step'
+		self.server.close()
+		print self.list_folders()
+
+		
 class Outbox:
 	""" A list of mail messages that can be periodically sent to their recipients. """
 	
@@ -79,8 +114,7 @@ class Outbox:
 	def send_all (self, password):
 		""" sends all the messages """
 		print "Sendall called."
-		for mNumber in self.queue:
-			
+		for mNumber in self.queue:			
 			self.send(self.queue.pop(), password)
 
 	def send(self, message, password):

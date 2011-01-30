@@ -1,7 +1,6 @@
-from distutils.core import setup
-import py2exe
-
+from setuptools import setup, find_packages
 setup(
-    script_args=['py2exe'],
-    window="frequency.py"
+    name = "Frequency",
+    version = "0.1",
+    packages = find_packages(),
 )
