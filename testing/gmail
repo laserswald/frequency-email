@@ -16,7 +16,7 @@ S'pop.gmail.com'
 p7
 sS'name'
 p8
-Vgmail
+S'gmail'
 p9
 sS'out_port'
 p10
@@ -24,7 +24,7 @@ S'587'
 p11
 sS'mboxDir'
 p12
-Vgmail.mail
+S'gmail.mail'
 p13
 sS'out_server'
 p14
