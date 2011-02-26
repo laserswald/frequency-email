@@ -111,7 +111,7 @@ class AccountFrame(Frame):
 		'''
 		class initializer
 		'''
-		
+		Frame.__init__(self, master)
 		self.control = StringVar()
 		
 		emailframe = Frame(self)
