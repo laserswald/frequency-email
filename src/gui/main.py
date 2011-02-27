@@ -20,9 +20,12 @@
 #	   MA 02110-1301, USA.
 from Tkinter import *
 from ttk import *
-import dialogs
+from TabbedToolbar import Ribbon
+from statusbar import StatusBar
 from PIL import Image, ImageTk
+import dialogs
 import os
+
 class MainWindow(object):
 
 	def __init__(self, logic):
@@ -31,40 +34,34 @@ class MainWindow(object):
 		self.dialogs = dialogs.DialogManager(self.master)
 		self.setup_widgets()
 		
+
+		
 	def setup_widgets (self):
 		"""
 		Sets up all the user interface in the main window.
 		"""
 
 		
-		self.master.title("Email")
+		self.master.title("Frequency")
 		self.master.iconbitmap("icons/Frequency.ico")
-		
+		self.master.columnconfigure(0, weight = 1)
+		self.master.rowconfigure(1, weight = 1)
 		self.setup_icons()
+		self.ribbon = Ribbon(self.master)		
+		self.ribbon.menu.addCommand("Send/Recieve", self.logic.send_receive, icon = self.email_icon)		
+		#self.filemenu.add_cascade(label = "Account", menu = self.AccountMenu)
+		self.ribbon.menu.addCommand('Options', self.logic.options, icon = self.wrench_icon)
+		self.ribbon.menu.addCommand("Exit", self.logic.quit, icon = self.door_in_icon)
 		
-		self.master.grid_rowconfigure(1, weight = 1)
-		self.master.grid_columnconfigure(0, weight = 1)
-		self.filemenu = Menu()
-		self.AccountMenu = Menu(self.filemenu)
+		self.ribbon.set_main_icon('icons/table.png')
+		self.ribbon.grid(sticky = N+S+E+W)
 		
-		
-		self.filemenu.add_command(label = "Send/Recieve", image = self.email_icon, compound = LEFT, command = self.logic.send)		
-		self.filemenu.add_cascade(label = "Account", menu = self.AccountMenu)
-		self.filemenu.add_command(label = 'Options', image = self.wrench_icon, compound = LEFT)
-		self.filemenu.add_command(label = "Exit", image = self.door_in_icon, compound = LEFT)
-		
-		self.TopButton = Menubutton(text = 'Frequency',
-									menu = self.filemenu, 
-									image = self.email_icon,
-									compound = LEFT)
-		self.TopButton.grid(row = 0, column = 0, sticky = W+N)
-									
 		self.panes = PanedWindow(self.master, orient = HORIZONTAL)
 
 		self.mailboxTree = Treeview(self.panes,
 									show = 'tree headings')
 
-		#self.mailboxTree.bind("<<TreeviewSelect>>", self.box_selected)
+		self.mailboxTree.bind("<<TreeviewSelect>>", self.logic.box_selected)
 
 
 
@@ -75,64 +72,26 @@ class MainWindow(object):
 
 		self.messageColumns = ('Subject',
 							'From',
-							'To',
 							'Date')
 		self.messageList = Treeview(self.master,
 									columns = self.messageColumns,
 									show = 'headings')
 		for heading in self.messageColumns:
 			self.messageList.heading(heading, text = heading)
-		self.messageList.bind("<<TreeviewSelect>>", self.message_selected)
+		self.messageList.bind("<<TreeviewSelect>>", self.logic.message_selected)
 
 
 		self.rightpanes.add(self.messageList)
 		self.panes.add(self.rightpanes)
 		#self.messageLis
-		self.panes.grid(row = 1, column = 0, sticky = N+S+E+W)
-		#self.status.set("Welcome to Frequency!")
+		self.status = StatusBar(self.master)
+		self.status.grid(row = 2, sticky = E+W)
+		self.panes.grid(row = 1, sticky = N+S+E+W)
+		self.update_status("Welcome to Frequency!")
 		
-		
-		
 
 
-	def message_selected(self, event):
-		item = self.messageList.selection()
-		index = int(item[0].strip('I'))-1
-		key = self.messageKeys[index]
-		displayedMessage = self.inboxes.get_message(key)
-		self.mView = messageView.MessageView(self.master)
-		self.mView.load_from_message(displayedMessage)
 
-	def get_mailboxes(self):
-		self.boxlist = self.inboxes.retrieve_mailboxes()
-		for box in self.boxlist:
-			hie = box.split('/')
-			if len(hie) == 2:
-				folder, mailbox = hie
-			elif len(hie) == 1:
-				folder = ''; mailbox = hie[0]
-			self.mailboxTree.insert(folder, 'end', mailbox, text=mailbox)
-
-	def box_selected(self, event):
-		self.messageKeys = []
-		boxname = event.widget.selection()[0]
-		while True:
-			try:
-				self.selectedBox = self.inboxes.get_folder(boxname)
-				break
-			except:
-				self.inboxes.add_folder(boxname)
-		try:
-			self.messageList.set_children('')
-		except:
-			print 'no items'
-		for key, message in self.selectedBox.iteritems():
-			treevalues = (message['Subject'],
-						message['From'],
-						message['Date'])
-			self.messageList.insert('', 'end', values=treevalues)
-			self.messageKeys.append(key)
-		self.status.push(self.mailContext, 'Messages for folder %s loaded.' % boxname)
 
 	def sortby(self, tree, col, descending):
 		"""Sort tree contents when a column is clicked on."""
@@ -168,6 +127,13 @@ class MainWindow(object):
 		self.door_in_icon =  ImageTk.PhotoImage(Image.open('icons/door_in.png'))
 		self.user_icon = ImageTk.PhotoImage(Image.open('icons/user.png'))
 		self.wrench_icon = ImageTk.PhotoImage(Image.open('icons/wrench.png'))
+		
+	def update_status(self, status):
+		'''
+		proxy for Statusbar.set
+		'''
+		self.status.set(status)
+	
 				
 	def start(self):
 		self.master.mainloop()

@@ -20,6 +20,7 @@
 #	   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #	   MA 02110-1301, USA.
 from Tkinter import *
+from ttk import *
 
 
 class StatusBar(Frame):
@@ -27,7 +28,7 @@ class StatusBar(Frame):
 	
 	def __init__(self, master):
 		Frame.__init__(self, master)
-		self.label = Label(self, bd=1, relief=SUNKEN, anchor=W)
+		self.label = Label(self, relief=SUNKEN, anchor=W)
 		self.label.pack(fill=X)
 		
 

@@ -25,21 +25,6 @@ import account
 import os
 import mainLogic
 
-class EmailAccount(account.Account):
-
-	def __init__(self, email, type, in_server, in_port, out_server, out_port):
-		self.in_server = in_server
-		self.in_port = in_port
-		self.out_server = out_server
-		self.out_port = out_port
-		self.email = email
-		self.type = type
-		self.name = os.path.relpath(tkFileDialog.asksaveasfilename(title = "Save as.."))
-		self.mboxDir = os.path.splitext(self.name)[0] + "Mail"
-
-		self.save()
-
-
 class EmailAccountManager(account.AccountManager):
 	def __init__(self, gui, configfile = 'AccountConfig.ini'):
 		self.gui = gui
@@ -52,10 +37,23 @@ class EmailAccountManager(account.AccountManager):
 			self.currentAccount.save()
 		if welcome:
 			self.gui.dialogs.welcome()
+			
 		popup = self.gui.dialogs.settings()
-		self.currentAccount = EmailAccount(popup.email, popup.type, popup.server, popup.port, popup.smtp_server, popup.smtp_port)
+		accountDefs = {'email': popup.email, 'type': popup.type, 'in_server': popup.server, 'in_port': popup.port, 'out_server': popup.smtp_server, 'out_port': popup.smtp_port}
+		#TODO : Fix this rubbish so that the account dialog returns a dict
+		askname= self.gui.dialogs.askString("Account", "Please give a name to the account.")
+		mboxdir =  os.path.splitext(askname)[0] + "Mail"
+		self.currentAccount = account.Account(self)
+		self.currentAccount.add_item('name', askname)
+		self.currentAccount.add_item('mboxdir', mboxdir)
+		for x in accountDefs:
+			print x
+			self.currentAccount.add_item(x, accountDefs[x])
+		
 		if default:
 			self.set_as_default()
+		
+		self.save_account()
 
 	def choose_account (self):
 		""" asks for a file to load. If there is no file, it makes a new one. """

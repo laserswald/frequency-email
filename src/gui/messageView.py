@@ -19,7 +19,6 @@ class MessageView(composer.Composer):
         Constructor
         '''
         Toplevel.__init__(self, master)
-        self.tb = toolbar.Toolbar()
         self.view = browser.Browser(self)
         self.view.pack(fill=BOTH, expand=1)
     

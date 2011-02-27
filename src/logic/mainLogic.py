@@ -8,6 +8,8 @@ import emailAccount
 import gui.main
 import gui.dialogs
 import gui.composer
+import gui.messageView
+import mailtoss
 
 class MainWindowLogic(object):
 	'''
@@ -21,39 +23,46 @@ class MainWindowLogic(object):
 
 		self.setupGui()
 		self.acctManager = emailAccount.EmailAccountManager(self.gui)		
-		self.outbox = sendMail.Outbox(self.acctManager.currentAccount)
-		self.inboxes = sendMail.Inbox(self.acctManager.currentAccount)
+		self.outbox = mailtoss.Outbox(self.acctManager.currentAccount)
+		self.inboxes = mailtoss.Inbox(self.acctManager.currentAccount, self.gui)
+		self.get_mailboxes()
 		self.gui.start()
-		
-
 			
-	def send(self): #Main mail driver.
-
-		password = self.gui.askPassword()
+	def send(self):
+		'''
+		Sends email.
+		'''
+		password = self.gui.dialogs.askPassword()
 		try:
 			self.outbox.send_all(password)
-			self.status.push(self.mailContext, "All mail sent!")
+			self.gui.update_status("All mail sent!")
 		except:
-			self.status.push(self.mailContext, "Mail sending failed.")
+			self.gui.update_status("Mail sending failed.")
+	
+
 
 	def send_receive(self):
-		pass
+		'''
+		Sends and receives all email.
+		'''
+		self.send()
+		self.get_mailboxes()
 
 	def compose (self):
 		""" Launches the composer. """
 		compose = self.gui.Composer(self.acctManager.currentAccount)
 		try:
 			self.outbox.add(compose.returned)
-			self.gui.updateStatus('Composition successful. Message now in outbox.')
+			self.gui.update_status('Composition successful. Message now in outbox.')
 		except AttributeError:
-			self.gui.updateStatus(self.mailContext, 'Message was not saved.')
+			self.gui.update_status('Message was not saved.')
 
 	def setup_account_manager (self):
 		""" sets up the Account management class. """
 		self.acctManager = emailAccount.EmailAccountManager()
 
 
-	def get_mail(self, boxname):
+	def receive(self, boxname):
 		"""Gets the mail from the selected mailbox."""
 		self.inboxes.retrieve_mail(boxname)
 
@@ -68,12 +77,12 @@ class MainWindowLogic(object):
 				folder = ''; mailbox = hie[0]
 			self.gui.mailboxTree.insert(folder, 'end', mailbox, text=mailbox)
 
-	def message_selected(self):
-		item = self.messageList.selection()
+	def message_selected(self, event):
+		item = self.gui.messageList.selection()
 		index = int(item[0].strip('I'), base=16) - 1
 		key = self.messageKeys[index]
 		displayedMessage = self.selectedBox.get_message(key)
-		self.mView = gui.MessageView(self.master)
+		self.mView = gui.messageView.MessageView(self.gui.master)
 		self.mView.load_from_message(displayedMessage)
 
 	def sortby(self, tree, col, descending):
@@ -101,6 +110,32 @@ class MainWindowLogic(object):
 		tree.heading(col,
 			command=lambda col=col: self.sortby(tree, col, int(not descending)))
 
+	def box_selected(self, what):
+		print what
+		self.messageKeys = []
+		boxname = self.gui.mailboxTree.selection()[0]
+		
+		while True:
+			try:
+				self.selectedBox = self.inboxes.get_folder(boxname)
+				break
+			except:
+				self.inboxes.add_folder(boxname)
+				self.receive(boxname)
+
+		try:
+			self.messageList.set_children('')
+		except:
+			print 'no items'
+		for key in self.selectedBox.iterkeys():
+			message = self.selectedBox.get_message(key)
+			treevalues = (message['Subject'],
+						  message['From'],
+						  message['Date'])
+			self.gui.messageList.insert('', 'end', values=treevalues)
+			self.messageKeys.append(key)
+		self.gui.update_status('Messages for folder %s loaded.' % boxname)
+			
 	def edit_account(self):
 		print 'Edit Account called!'
 
@@ -116,3 +151,9 @@ class MainWindowLogic(object):
 	def setupGui(self):
 		self.gui = gui.main.MainWindow(self)
 		
+	def options(self):
+		'''
+		Opens the options dialog.
+		'''
+		self.gui.dialogs.settings()
+	

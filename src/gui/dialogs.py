@@ -116,11 +116,11 @@ class AccountFrame(Frame):
 		
 		emailframe = Frame(self)
 		Label(emailframe, text="Email Address:").pack(side=LEFT)
-		self.em = Entry(emailframe)
-		self.em.pack(side=LEFT)
+		self.email = Entry(emailframe)
+		self.email.pack(side=LEFT)
 		emailframe.pack(fill = X)
 		
-		inmailFrame = LabelFrame(accountFrame, text = "Incoming Server")
+		inmailFrame = LabelFrame(self, text = "Incoming Server")
 		
 		intypeframe = Frame(inmailFrame)
 		Label(intypeframe, text = "Incoming mail type:").pack(side=LEFT)
@@ -132,29 +132,30 @@ class AccountFrame(Frame):
 		
 		inserverFrame = Frame(inmailFrame)
 		Label(inserverFrame, text="Server:").pack(side=LEFT)
-		self.e1 = Entry(inserverFrame)
-		self.e1.pack(side=LEFT)
+		self.inserver = Entry(inserverFrame)
+		self.inserver.pack(side=LEFT)
 		inserverFrame.pack(fill = X)
 		
 		inportFrame = Frame(inmailFrame)
 		Label(inportFrame, text="Port:").pack(side=LEFT)		
-		self.e2 = Entry(inportFrame)		
-		self.e2.pack(side=LEFT)
+		self.inport = Entry(inportFrame)		
+		self.inport.pack(side=LEFT)
 		inportFrame.pack(fill = X)
 		
 		inmailFrame.pack()
 		
-		smtpFrame = LabelFrame(accountFrame, text = 'Outgoing Server')
+		smtpFrame = LabelFrame(self, text = 'Outgoing Server')
 		
 		sserverframe = Frame(smtpFrame)
 		Label(sserverframe, text="Server:").pack(side=LEFT)
-		self.e3 = Entry(sserverframe).pack(side=LEFT)
+		self.sserver = Entry(sserverframe)
+		self.sserver.pack(side=LEFT)
 		sserverframe.pack()
 		
 		sportFrame = Frame(smtpFrame)
 		Label(sportFrame, text="Port:").pack(side=LEFT)		
-		self.e4 = Entry(sportFrame)
-		self.e4.pack(side=LEFT)
+		self.sport = Entry(sportFrame)
+		self.sport.pack(side=LEFT)
 		sportFrame.pack()
 		
 		smtpFrame.pack()
@@ -164,10 +165,22 @@ class OptionsDialog(Dialog):
 	def body(self, master):
 
 		notebook = Notebook(master)	
-		accountFrame = AccountFrame(notebook)
-		notebook.add(accountFrame, text = 'Accounts')
+		self.accountFrame = AccountFrame(notebook)
+		notebook.add(self.accountFrame, text = 'Accounts')
 		notebook.pack(side=TOP, fill=BOTH, expand = 1)
 		
+	def apply(self):
+		'''
+		Apply the items in the dialog.	
+		'''
+		self.email = self.accountFrame.email.get()
+		self.type = self.accountFrame.control.get()
+		print self.type
+		self.server = self.accountFrame.inserver.get()
+		self.port = self.accountFrame.inport.get()
+		self.smtp_server = self.accountFrame.sserver.get()
+		self.smtp_port = self.accountFrame.sport.get()
+	
 
 
 
@@ -202,9 +215,9 @@ class DialogManager(object):
 	def askPassword(self):
 		passw = tkSimpleDialog.askstring(
 									"Password?",
-									"Please enter your email's password.",
-									show = "*"									
+									"Please enter your email's password.",						
 								)
+		print passw
 		return passw		
 		
 	def openfile(self, title):
@@ -216,4 +229,25 @@ class DialogManager(object):
 		Opens the settings dialog.
 		'''
 		settings = OptionsDialog(self.master)
+		return settings
+	
+	def savefile(self, title):
+		'''
+		Proxy for the Tk file saving dialog.
+		'''
+		name = tkFileDialog.asksaveasfilename(defaultextension = "fqa", title = title)
+		return name
+		
+	def askString(self, title, text):
+		'''
+		Proxy for Tk string entry dialog.
+		'''
+		string = tkSimpleDialog.askstring(title,text)
+		return string
+	
+	def error(self, title, text):
+		'''
+		Proxy for Tk error box.
+		'''
+		tkMessageBox.showerror(title, text)
 	

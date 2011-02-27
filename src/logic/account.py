@@ -26,16 +26,16 @@ import emailAccount
 class Account(object):
 	""" An individual account for things. Not to be used by itself, please. """
 	data = {}
-	def __init__ (self, manager, name = 'default'):
+	def __init__ (self, manager):
 		""" Class initialiser.
 		
 		manager - an Account Manager to accociate with.
 		"""
 		self.manager = manager
-		self.name = name
+
 	
-	def add_item (self, name, value):
-		self.data[name] = value
+	def add_item (self, key, value):
+		self.data[key] = value
 		
 		
 class AccountError(Exception):
@@ -48,7 +48,7 @@ class AccountManager(object):
 	
 	config = ConfigParser.SafeConfigParser()
 	
-	def __init__ (self, configfile = 'config.ini'):
+	def __init__ (self, configfile):
 		""" 
 		Class initialiser.
 		
@@ -66,9 +66,15 @@ class AccountManager(object):
 		except IOError:
 			self.setup_config()
 		try:  
-			self.defaultSection = self.config.get('Global', 'Default')
+			self.defaultSection = self.config.get('Global', 'Default')		
+			if self.config.has_option(self.defaultSection, 'name'):
+				self.load_account(self.defaultSection)
+			else:
+				raise Exception
 		except:
 			self.new_account(default = True)
+			
+
 
 			
 	def setup_config (self):
@@ -106,8 +112,18 @@ class AccountManager(object):
 		self.config.add_section(account.data['name'])
 		print account.data
 		for field in account.data:
-			self.config.set(account.data['name'], field, account.data[field])
+			self.config.set(account.data['name'], field, str(account.data[field]))
 		self.config.write(open(self.configFile, 'w'))
+		
+	def load_account(self, section):
+		'''
+		Loads the specified account from the file. 
+		'''
+		self.currentAccount = Account(self)
+		for name, value in self.config.items(section):
+			self.currentAccount.add_item(name, value)
+		
+	
 
 	def __del__(self):
 		self.save_account()

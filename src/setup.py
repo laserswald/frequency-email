@@ -21,11 +21,20 @@ setup(
 							 'icons/door_in.png',
 							 'icons/user.png',
 							 'icons/wrench.png',
-							 ])
+							 'icons/table.png'])
 	],
 	options = {
 		"py2exe": {
-			"dist_dir":"../dist"
+			"dist_dir":"../dist",
+			'includes':['email.iterators',
+						'email.mime.application',
+						'email.mime.audio',
+						'email.mime.base',
+						'email.mime.text',
+						'email.mime.image',
+						'email.mime.multipart',
+						'email.mime.message',
+						'email.mime.nonmultipart']
 		}
 	}
 )
