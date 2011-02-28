@@ -128,7 +128,7 @@ class Composer(Toplevel):
 			for part in parsedFile.walk():
 				if part.get_content_maintype() == 'multipart':
 					continue
-				if part.get_content_maintype() == 'text':
+				if part.get_content_type() == 'text/plain':
 					payloadText += part.get_payload(decode = True)
 			self.maintext.insert(END, payloadText)
 

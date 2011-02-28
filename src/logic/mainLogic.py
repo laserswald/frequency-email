@@ -85,30 +85,7 @@ class MainWindowLogic(object):
 		self.mView = gui.messageView.MessageView(self.gui.master)
 		self.mView.load_from_message(displayedMessage)
 
-	def sortby(self, tree, col, descending):
-		"""Sort tree contents when a column is clicked on."""
-		# grab values to sort
-		data = [(tree.set(child, col), child) for child in tree.get_children('')]
-		if col == 'Date':
-			newData = []
-			for index, item in enumerate(data):
-				date = item[0]
-				dataitem = (rfc822.parsedate(date), index, item)
-				newData.append(dataitem)
 
-			newData.sort(reverse=descending)
-			for set in enumerate(newData):
-				print set
-				parsedate, indx, item = set
-				tree.move(item[1], '', indx)
-		# reorder data
-		data.sort(reverse=descending)
-		for indx, item in enumerate(data):
-			tree.move(item[1], '', indx)
-
-		# switch the heading so that it will sort in the opposite direction
-		tree.heading(col,
-			command=lambda col=col: self.sortby(tree, col, int(not descending)))
 
 	def box_selected(self, what):
 		print what
@@ -121,18 +98,12 @@ class MainWindowLogic(object):
 				break
 			except:
 				self.inboxes.add_folder(boxname)
-				self.receive(boxname)
-
-		try:
-			self.messageList.set_children('')
-		except:
-			print 'no items'
+				self.receive(boxname)		
+		self.gui.messageList.set_children('')		
 		for key in self.selectedBox.iterkeys():
 			message = self.selectedBox.get_message(key)
-			treevalues = (message['Subject'],
-						  message['From'],
-						  message['Date'])
-			self.gui.messageList.insert('', 'end', values=treevalues)
+
+			self.gui.messageList.add_message(message)
 			self.messageKeys.append(key)
 		self.gui.update_status('Messages for folder %s loaded.' % boxname)
 			
@@ -156,4 +127,11 @@ class MainWindowLogic(object):
 		Opens the options dialog.
 		'''
 		self.gui.dialogs.settings()
+		
+	def box_rightclick(self, event):
+		'''
+		Opens up a context menu for the item.
+		'''
+		print "box.rightclick called"
+	
 	

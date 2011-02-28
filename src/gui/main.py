@@ -22,6 +22,7 @@ from Tkinter import *
 from ttk import *
 from TabbedToolbar import Ribbon
 from statusbar import StatusBar
+from msglist import MessageList
 from PIL import Image, ImageTk
 import dialogs
 import os
@@ -60,7 +61,7 @@ class MainWindow(object):
 
 		self.mailboxTree = Treeview(self.panes,
 									show = 'tree headings')
-
+		self.mailboxTree.bind(('<3>'), self.logic.box_rightclick)
 		self.mailboxTree.bind("<<TreeviewSelect>>", self.logic.box_selected)
 
 
@@ -70,14 +71,9 @@ class MainWindow(object):
 
 
 
-		self.messageColumns = ('Subject',
-							'From',
-							'Date')
-		self.messageList = Treeview(self.master,
-									columns = self.messageColumns,
-									show = 'headings')
-		for heading in self.messageColumns:
-			self.messageList.heading(heading, text = heading)
+
+		self.messageList = MessageList(self.rightpanes)
+
 		self.messageList.bind("<<TreeviewSelect>>", self.logic.message_selected)
 
 
