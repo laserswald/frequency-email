@@ -117,7 +117,7 @@ class MainWindowLogic(object):
 		print 'New Account called!'
 		
 	def quit(self):
-		pass
+		self.gui.quit()
 
 	def setupGui(self):
 		self.gui = gui.main.MainWindow(self)

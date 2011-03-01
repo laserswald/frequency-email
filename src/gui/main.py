@@ -130,6 +130,8 @@ class MainWindow(object):
 		'''
 		self.status.set(status)
 	
+	def quit(self):
+		self.master.destroy()
 				
 	def start(self):
 		self.master.mainloop()
