@@ -1,3 +1,0 @@
-all:
-	python frequency.py
-
