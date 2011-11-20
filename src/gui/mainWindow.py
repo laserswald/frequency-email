@@ -23,6 +23,7 @@ from ttk import *
 import tkMessageBox
 from PIL import Image, ImageTk
 import os
+import dialogs
 
 
 class MainWindow(object):
@@ -38,9 +39,10 @@ class MainWindow(object):
 		"""
 		
 		self.master.title("Email")
-		self.master.iconbitmap("icons/Frequency.ico")
-		
-		self.setupIcons()
+		if os.name == "nt":
+			self.master.iconbitmap("/icons/Frequency.ico")
+		self.dialogs = dialogs.DialogManager(self.master)
+		#self.setupIcons()
 		
 		self.master.grid_rowconfigure(1, weight = 1)
 		self.master.grid_columnconfigure(0, weight = 1)
@@ -48,14 +50,14 @@ class MainWindow(object):
 		self.AccountMenu = Menu(self.filemenu)
 		
 		
-		self.filemenu.add_command(label = "Send/Recieve", image = self.email_icon, compound = LEFT, command = self.logic.send)		
+		self.filemenu.add_command(label = "Send/Recieve",  compound = LEFT)		
 		self.filemenu.add_cascade(label = "Account", menu = self.AccountMenu)
-		self.filemenu.add_command(label = 'Options', image = self.wrench_icon, compound = LEFT)
-		self.filemenu.add_command(label = "Exit", image = self.door_in_icon, compound = LEFT)
+		self.filemenu.add_command(label = 'Options', compound = LEFT)
+		self.filemenu.add_command(label = "Exit",  compound = LEFT)
 		
 		self.TopButton = Menubutton(text = 'Frequency',
 									menu = self.filemenu, 
-									image = self.email_icon,
+									
 									compound = LEFT)
 		self.TopButton.grid(row = 0, column = 0, sticky = W+N)
 									
@@ -158,15 +160,16 @@ class MainWindow(object):
 		tree.heading(col,
 			command=lambda col=col: self.sortby(tree, col, int(not descending)))
 			
-	def setupIcons(self):		
-		self.email_icon = ImageTk.PhotoImage(Image.open('icons/email.png'))
-		self.email_add_icon = ImageTk.PhotoImage(Image.open('icons/email_add.png'))
-		self.email_delete_icon = ImageTk.PhotoImage(Image.open('icons/email_delete.png'))
-		self.email_attach_icon = ImageTk.PhotoImage(Image.open('icons/email_attach.png'))
-		self.email_edit_icon = ImageTk.PhotoImage(Image.open('icons/email_edit.png'))
-		self.door_in_icon =  ImageTk.PhotoImage(Image.open('icons/door_in.png'))
-		self.user_icon = ImageTk.PhotoImage(Image.open('icons/user.png'))
-		self.wrench_icon = ImageTk.PhotoImage(Image.open('icons/wrench.png'))
+	def setupIcons(self):
+		print os.getcwd()
+		self.email_icon = ImageTk.PhotoImage(Image.open('src/icons/email.png'))
+		self.email_add_icon = ImageTk.PhotoImage(Image.open('src/icons/email_add.png'))
+		self.email_delete_icon = ImageTk.PhotoImage(Image.open('src/icons/email_delete.png'))
+		self.email_attach_icon = ImageTk.PhotoImage(Image.open('src/icons/email_attach.png'))
+		self.email_edit_icon = ImageTk.PhotoImage(Image.open('src/icons/email_edit.png'))
+		self.door_in_icon =  ImageTk.PhotoImage(Image.open('src/icons/door_in.png'))
+		self.user_icon = ImageTk.PhotoImage(Image.open('src/icons/user.png'))
+		self.wrench_icon = ImageTk.PhotoImage(Image.open('src/icons/wrench.png'))
 
 
 		

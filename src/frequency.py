@@ -1,7 +1,8 @@
-import logic.mainLogic
+import mail.mainLogic as mainLogic
+import os
 
 def main():
-	mwl = logic.mainLogic.MainWindowLogic()
+	mwl = mainLogic.MainWindowLogic()
 	
 if __name__ == "__main__":
 	main()

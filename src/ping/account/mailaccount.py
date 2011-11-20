@@ -47,7 +47,7 @@ class EmailAccountManager(account.AccountManager):
 		self.currentAccount.add_item('name', askname)
 		self.currentAccount.add_item('mboxdir', mboxdir)
 		for x in accountDefs:
-			print x
+			print(x)
 			self.currentAccount.add_item(x, accountDefs[x])
 		
 		if default:

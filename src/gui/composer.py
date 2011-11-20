@@ -24,7 +24,6 @@ from Tkinter import *
 from ttk import *
 from Tkconstants import *
 from toolbar import *
-from logic import emailAccount, mailtoss
 import tkFileDialog, ScrolledText, tkSimpleDialog
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
@@ -96,7 +95,7 @@ class Composer(Toplevel):
 			return flatm
 		else:
 			return m
-
+		
 	def save_mail(self): #Save mail as a text file.
 		text = self.convert_to_message(flatten = True)
 		self.savefile = tkFileDialog.asksaveasfilename(title = "Save as..")
@@ -131,11 +130,6 @@ class Composer(Toplevel):
 				if part.get_content_type() == 'text/plain':
 					payloadText += part.get_payload(decode = True)
 			self.maintext.insert(END, payloadText)
-
-
-
-
-
 
 	def new_button_cb(self):
 		buttonname = tkSimpleDialog.askstring("Email", "What should the email be?")

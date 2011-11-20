@@ -4,12 +4,12 @@ Created on Jan 30, 2011
 @author: ben
 '''
 import rfc822
-import emailAccount
-import gui.main
+import mail.emailAccount
+import gui.mainWindow
 import gui.dialogs
 import gui.composer
 import gui.messageView
-import mailtoss
+import mail.outbox
 
 class MainWindowLogic(object):
 	'''
@@ -22,11 +22,11 @@ class MainWindowLogic(object):
 		'''
 
 		self.setupGui()
-		self.acctManager = emailAccount.EmailAccountManager(self.gui)
-		self.outbox = mailtoss.Outbox(self.acctManager.currentAccount)
-		self.inbox = mailtoss.get_inbox(self.acctManager.currentAccount, self.gui)
+		self.acctManager = mail.emailAccount.EmailAccountManager(self.gui)
+		self.outbox = mail.outbox.Outbox(self.acctManager.currentAccount)
+		self.inbox = mail.outbox.get_inbox(self.acctManager.currentAccount, self.gui)
 		self.get_mailboxes()
-		self.gui.start()
+		
 
 	def send(self):
 		'''
@@ -59,7 +59,7 @@ class MainWindowLogic(object):
 
 	def setup_account_manager (self):
 		""" sets up the Account management class. """
-		self.acctManager = emailAccount.EmailAccountManager()
+		self.acctManager = mail.emailAccount.EmailAccountManager()
 
 
 	def receive(self):
@@ -120,7 +120,8 @@ class MainWindowLogic(object):
 		self.gui.quit()
 
 	def setupGui(self):
-		self.gui = gui.main.MainWindow(self)
+		self.gui = gui.mainWindow.MainWindow(self)
+		self.gui.start()
 
 	def options(self):
 		'''
