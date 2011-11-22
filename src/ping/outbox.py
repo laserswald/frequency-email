@@ -22,56 +22,54 @@
 #      MA 02110-1301, USA.
 
 import smtplib
-import poplib
-import imaplib
-import mailbox
+
 
 class Outbox:
-	""" A list of mail messages that can be periodically sent to their recipients. """
-	server = None;
+    """ A list of mail messages that can be periodically sent to their recipients. """
+    server = None;
 
-	def __init__ (self, account):
-		"""
-		Constructor.
+    def __init__ (self, account):
+        """
+        Constructor.
 
-		account -- the account that will be used to send mail.
-		"""
-		self.queue = []
-		self.account = account
+        account -- the account that will be used to send mail.
+        """
+        self.queue = []
+        self.account = account
 
-	def add (self, message):
-		""" Adds a message to the list.
+    def add (self, message):
+        """ Adds a message to the list.
 
-		message -- The message to add.
-		"""
-		self.queue.append(message)
+        message -- The message to add.
+        """
+        self.queue.append(message)
 
-	def send_all (self, password):
-		""" sends all the messages """
-		self.connect(secure = True)
-		self.login(password)
-		for mNumber in self.queue:
-			self.send_msg(self.queue.pop())
-		self.close()
-		
-	def send(self, message, password):
-	    """Sends a single message."""
+    def send_all (self, password):
+        """ sends all the messages """
+        self.connect(secure = True)
+        self.login(password)
+        for mNumber in self.queue: #@UnusedVariable
+            self.send_msg(self.queue.pop())
+        self.close()
+        
+    def send(self, message, password):
+        """Sends a single message."""
         self.connect(secure = True)
         self.login(password)
         self.send_msg(message)
         self.close()
 
 
-	def send_msg(self, message):
-		self.server.sendmail(self.account.email, message['to'], message.as_string())
-		
-	def login(self, password):
-	    self.server.ehlo()
-		self.server.starttls()
-		self.server.ehlo()
-		self.server.login(self.account.email, password)
-		
-		
+    def send_msg(self, message):
+        self.server.sendmail(self.account.email, message['to'], message.as_string())
+        
+    def login(self, password):
+        self.server.ehlo()
+        self.server.starttls()
+        self.server.ehlo()
+        self.server.login(self.account.email, password)
+        
+        
     def connect(self, secure = False):
         if secure: 
             self.server = smtplib.SMTP_SSL(self.account.out_server, self.account.out_port)
