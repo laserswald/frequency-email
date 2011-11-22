@@ -15,25 +15,16 @@ class ImapBox(inbox.Inbox):
         typ, data = self.server.search(None, what)
         total = len(data[0].split())
         for num in data[0].split():
-            typ, data = self.server.fetch(num, '(RFC822)')
-            self.currentBox.add(data[0][1])
-        self.server.close()
-	return total
+            self.getMessage(num)
+        self.disconnect()
+	    return total      
 
-
-
-    def setupServer(self, username, password, ssl = False):
-        self.server = imaplib.IMAP4_SSL(self._account.data['in_server'], int(self._account.data['in_port']))
-        
-       
-
-    def refreshMailboxes(self):
+    def getFolderList(self):
         '''
         Retrieves the email mailboxes.
         '''
         self.folderlist = []
         status, self.mailboxraw = self.server.list()
-        self.gui.update_status('Creating subfolder structure...')
         for box in self.mailboxraw:
             boxstuff = box.split('" "')
             folderpath = boxstuff[1].strip('"')
@@ -68,46 +59,29 @@ class ImapBox(inbox.Inbox):
             tree[start] = self.folderToTree(folder, newtree)
         return tree
 
-    def retrieve_folders(self):
-        return self.splitToTree(self.folderlist)
-
-
-
-    def __del__(self):
-        '''
-        Deletion.
-        '''
-        self.server.close()
-    
+    def getFolderTree(self):
+        return self.splitToTree(self.folderlist)    
   
-    def teardownServer(self):
-        pass
-    
-    def recieveFolders(self):
-        pass
-    
-    def getFolders(self):
-        pass
+    def disconnect(self):
+        self.server.close()
     
     def selectFolder(self):
         self.currentBox = self.get_folder(mailbox)
         self.server.select(mailbox)
     
-    def getMail(self):
-
+    def getMessage(self, msgnum):
+        diag, data = self.server.fetch(num, '(RFC822)')
+        self.currentBox.add(data[0][1])
+        return diag
     
-    def switchMailbox(self, mailbox, readOnly = False):
-        pass
-
-def open_connection(self, ssl = False):
+    def connect(self, ssl = False):
+        if ssl:
+            self.server = imaplib.IMAP4_SSL(self._account.data['in_server'], int(self._account.data['in_port']))
+        else:
+            self.server = imaplib.IMAP4(self._account.data['in_server'], int(self._account.data['in_port']))
 	
     def login(self, email=None, password):
-	if not email:
-            email = 
-	 self.server.login(email, )
-if __name__ == "__main__":
-	import Account
-	acct = Account.Account(None)
-	acct.add_item("email"
-	imap = ImapBox(
-        
+	    if not email:
+            email = self._account.data["email"]
+	    self.server.login(email, password)
+	    

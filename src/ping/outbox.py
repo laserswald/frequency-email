@@ -28,6 +28,7 @@ import mailbox
 
 class Outbox:
 	""" A list of mail messages that can be periodically sent to their recipients. """
+	server = None;
 
 	def __init__ (self, account):
 		"""
@@ -47,24 +48,35 @@ class Outbox:
 
 	def send_all (self, password):
 		""" sends all the messages """
-		print "Sendall called."
+		self.connect(secure = True)
+		self.login(password)
 		for mNumber in self.queue:
-			self.send(self.queue.pop(), password)
-
+			self.send_msg(self.queue.pop())
+		self.close()
+		
 	def send(self, message, password):
-		print "Send called: Account" + self.account.out_server
-		mailServer = smtplib.SMTP(self.account.out_server, self.account.out_port)
-		print "Server created."
-		mailServer.ehlo()
-		mailServer.starttls()
-		mailServer.ehlo()
-		mailServer.login(self.account.email, password)
-		print "Server logged in."
-		mailServer.sendmail(self.account.email, message['to'], message.as_string())
-		print "Message Sent."
-		# Should be mailServer.quit(), but that crashes...
-		mailServer.close()
-		print "Server closed."
+	    """Sends a single message."""
+        self.connect(secure = True)
+        self.login(password)
+        self.send_msg(message)
+        self.close()
 
 
-d
+	def send_msg(self, message):
+		self.server.sendmail(self.account.email, message['to'], message.as_string())
+		
+	def login(self, password):
+	    self.server.ehlo()
+		self.server.starttls()
+		self.server.ehlo()
+		self.server.login(self.account.email, password)
+		
+		
+    def connect(self, secure = False):
+        if secure: 
+            self.server = smtplib.SMTP_SSL(self.account.out_server, self.account.out_port)
+        else:
+            self.server = smtplib.SMTP_SSL(self.account.out_server, self.account.out_port)
+            
+    def disconnect(self):
+        self.server.close()
