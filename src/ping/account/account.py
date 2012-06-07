@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # An account managing system.
 
-import configparser
-
-
 class Account(object):
 	""" An individual account for things. Not to be used by itself, please. """
 	data = {}

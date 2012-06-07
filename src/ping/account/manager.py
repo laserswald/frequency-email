@@ -20,7 +20,7 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-import configparser
+import ConfigParser
 from account import Account
 import exception as ae
 
@@ -28,11 +28,12 @@ class AccountManager(object):
 	""" A manager for accounts. Can delete, add, set as default, load
 	from a configuration file, etc. """
 
-	def __init__ (self):
+	def __init__ (self, configfile):
 		"""
 		Class initialiser.
 		"""
-		self.config = configparser.SafeConfigParser()
+		self.configfile = configfile
+		self.config = ConfigParser.SafeConfigParser()
 		self.currentAccount = None
 		
 	def read_configuration (self):
@@ -46,13 +47,13 @@ class AccountManager(object):
 
 	def choose_account (self):
 		""" fixes the configuration file. Overload this."""
-		raise AccountError("Fixing the config file hasn't been overloaded")
+		raise ae.AccountError("Fixing the config file hasn't been overloaded")
 
 	def set_as_default (self):
 		""" writes the account name to the config file as the default. """
 		try:
 			self.config.set('Global', 'Default', self.currentAccount.data['name'])
-		except configparser.NoSectionError:
+		except ConfigParser.NoSectionError:
 			self.setup_config()
 			self.config.set('Global', 'Default', self.currentAccount.data['name'])
 		self.config.write(open(self.configFile, 'w'))

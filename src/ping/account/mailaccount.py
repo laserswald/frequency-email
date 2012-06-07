@@ -21,24 +21,23 @@
 #
 
 
+import manager
 import account
 import os
-import mainLogic
 
-class EmailAccountManager(account.AccountManager):
+
+class EmailAccountManager(manager.AccountManager):
 	def __init__(self, gui, configfile = 'AccountConfig.ini'):
 		self.gui = gui
-		account.AccountManager.__init__(self, configfile)
+		manager.AccountManager.__init__(self, configfile)
 		
 
-	def new_account (self, default = False, welcome = False):
+	def new_account (self, default = False):
 		""" Creates a new email account. """
 		if self.currentAccount:
 			self.currentAccount.save()
-		if welcome:
-			self.gui.dialogs.welcome()
 			
-		popup = self.gui.dialogs.settings()
+		popup = self.gui.dialogs.new_account()
 		accountDefs = {'email': popup.email, 'type': popup.type, 'in_server': popup.server, 'in_port': popup.port, 'out_server': popup.smtp_server, 'out_port': popup.smtp_port}
 		#TODO : Fix this rubbish so that the account dialog returns a dict
 		askname= self.gui.dialogs.askString("Account", "Please give a name to the account.")
@@ -63,8 +62,4 @@ class EmailAccountManager(account.AccountManager):
 		self.accountFile = self.gui.dialogs.openfile(title = "Open account file...")
 		self.open_account_file(self.accountFile)
 
-
-if __name__ == "__main__":
-	root = Tk()
-	manager = EmailAccountManager(root)
 

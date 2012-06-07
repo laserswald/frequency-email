@@ -15,11 +15,18 @@ class ImapBox(inbox.Inbox):
         typ, data = self.server.search(None, what)
         total = len(data[0].split())
         for num in data[0].split():
-            self.getMessage(num)
+            typ, data = self.server.fetch(num, '(RFC822)')
+            self.currentBox.add(data[0][1])
         self.disconnect()
-	    return total      
+	    return total
 
-    def getFolderList(self):
+
+
+    def setupServer(self, username, password, ssl = False):
+        self.server = imaplib.IMAP4_SSL(self._account.data['in_server'], int(self._account.data['in_port']))     
+       
+
+    def refreshMailboxes(self):
         '''
         Retrieves the email mailboxes.
         '''
@@ -59,29 +66,42 @@ class ImapBox(inbox.Inbox):
             tree[start] = self.folderToTree(folder, newtree)
         return tree
 
-    def getFolderTree(self):
-        return self.splitToTree(self.folderlist)    
+    def retrieve_folders(self):
+        return self.splitToTree(self.folderlist)
+
+
+
+    def __del__(self):
+        '''
+        Deletion.
+        '''
+        self.server.close()
+    
   
     def disconnect(self):
         self.server.close()
+    
+    def recieveFolders(self):
+        pass
+    
+    def getFolders(self):
+        pass
     
     def selectFolder(self):
         self.currentBox = self.get_folder(mailbox)
         self.server.select(mailbox)
     
-    def getMessage(self, msgnum):
-        diag, data = self.server.fetch(num, '(RFC822)')
-        self.currentBox.add(data[0][1])
-        return diag
+    def getMail(self):
+
     
+    def switchMailbox(self, mailbox, readOnly = False):
+        pass
+
     def connect(self, ssl = False):
-        if ssl:
-            self.server = imaplib.IMAP4_SSL(self._account.data['in_server'], int(self._account.data['in_port']))
-        else:
-            self.server = imaplib.IMAP4(self._account.data['in_server'], int(self._account.data['in_port']))
+        pass
 	
     def login(self, email=None, password):
 	    if not email:
-            email = self._account.data["email"]
-	    self.server.login(email, password)
+                email = 
+	    self.server.login(email, )
 	    

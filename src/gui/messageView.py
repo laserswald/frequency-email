@@ -5,11 +5,11 @@ Created on Jan 17, 2011
 '''
 from Tkinter import *
 from ttk import *
-import browser
-import composer
-import toolbar
+import gui.widget.browser
+import gui.composer
+import gui.widget.ToolFrame
 
-class MessageView(composer.Composer):
+class MessageView(gui.composer.Composer):
     '''
     An HTML viewer for a message.
     '''
