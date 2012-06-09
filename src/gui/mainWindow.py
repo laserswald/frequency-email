@@ -31,8 +31,10 @@ class MainWindow(object):
 
     def __init__(self, logic):
         self.logic = logic
-
-
+        self.master = Tk()
+        self.setup_widgets()
+        self.dialogs = dialogs.DialogManager(self.master)
+    
     def setup_widgets (self):
         """Sets up all the user interface in the main window.
         """
@@ -40,7 +42,6 @@ class MainWindow(object):
         self.master.title("Email")
         if os.name == "nt":
             self.master.iconbitmap("./icons/Frequency.ico")
-        self.dialogs = dialogs.DialogManager(self.master)
 
         
         self.master.grid_rowconfigure(1, weight = 1)
@@ -83,11 +84,11 @@ class MainWindow(object):
         self.fileMenu = Menu(self.mainMenu)
         
         self.newMenu = Menu(self.fileMenu)
-        self.newMenu.add_command(label = "Message", command = self.logic.new_message)
+        self.newMenu.add_command(label = "Message", command = self.new_message)
         self.fileMenu.add_cascade(label = "New", menu = self.newMenu)
         self.fileMenu.add_command(label = "Send/Recieve",  compound = LEFT)
-        self.fileMenu.add_command(label = 'Options', command = self.logic.options)
-        self.fileMenu.add_command(label = "Exit", command = self.logic.quit)
+        self.fileMenu.add_command(label = 'Options', command = self.options)
+        self.fileMenu.add_command(label = "Exit", command = self.quit)
         
         self.mainMenu.add_cascade(label = "File", menu = self.fileMenu)
         
@@ -125,10 +126,14 @@ class MainWindow(object):
 
     def quit(self):
         self.master.quit()
-            
+    
+    def new_message(self):
+        pass
+    
+    def options(self):
+        pass
+
     def start(self):
-        self.master = Tk()
-        self.setup_widgets()
         self.master.mainloop()
         return self
         

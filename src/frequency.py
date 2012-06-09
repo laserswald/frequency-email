@@ -19,13 +19,13 @@ class Frequency(object):
         '''
 
         self.setupGui()
-        #TODO: Make wizard for new account creation
         self.acctManager = ping.account.mailaccount.EmailAccountManager(self.gui)
         self.acctManager.new_account()
         self.outbox = ping.outbox.Outbox(self.acctManager.currentAccount)
         self.inbox = ping.inbox.Inbox.get_inbox(self.acctManager.currentAccount, self.gui)
         self.get_mailboxes()
-        
+        self.gui.start()
+
     def setup_account_manager (self):
         """ sets up the Account management class. """
         self.acctManager = emailAccount.EmailAccountManager()
@@ -35,7 +35,6 @@ class Frequency(object):
 
     def setupGui(self):
         self.gui = gui.mainWindow.MainWindow(self)
-        self.gui.start()
 	
 if __name__ == "__main__":
     frq = Frequency()
