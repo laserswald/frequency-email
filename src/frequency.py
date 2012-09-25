@@ -1,10 +1,8 @@
-
-import gui.mainWindow
-import gui.messageView
-import ping.account.mailaccount
-import ping.inbox
-import ping.outbox
-
+#! /usr/bin/python2
+from gui import mainWindow, messageView
+from ping.account import mailaccount
+from ping import boxfactory
+from ping import outbox
 
 class Frequency(object):
     '''
@@ -19,22 +17,21 @@ class Frequency(object):
         '''
 
         self.setupGui()
-        self.acctManager = ping.account.mailaccount.EmailAccountManager(self.gui)
+        self.acctManager = mailaccount.EmailAccountManager(self.gui)
         self.acctManager.new_account()
-        self.outbox = ping.outbox.Outbox(self.acctManager.currentAccount)
-        self.inbox = ping.inbox.Inbox.get_inbox(self.acctManager.currentAccount, self.gui)
-        self.get_mailboxes()
+        self.outbox = outbox.Outbox(self.acctManager.currentAccount)
+        self.inbox = boxfactory.get_inbox(self.acctManager.currentAccount, self.gui)
         self.gui.start()
 
     def setup_account_manager (self):
         """ sets up the Account management class. """
-        self.acctManager = emailAccount.EmailAccountManager()
+        self.acctManager = mailAccount.EmailAccountManager()
 
     def quit(self):
         self.gui.quit()
 
     def setupGui(self):
-        self.gui = gui.mainWindow.MainWindow(self)
+        self.gui = mainWindow.MainWindow(self)
 	
 if __name__ == "__main__":
     frq = Frequency()

@@ -5,11 +5,16 @@ Created on Jul 12, 2011
 '''
 
 import inbox
-
+import imaplib
 
 
 class ImapBox(inbox.Inbox):
     folderlist = []
+
+    def start(self, password):
+        self.connect()
+        self.login(password)
+        
 
     def retrieve_mail(self, mailbox = 'INBOX', what = 'ALL'):
         typ, data = self.server.search(None, what)
@@ -17,7 +22,7 @@ class ImapBox(inbox.Inbox):
         for num in data[0].split():
             self.getMessage(num)
         self.disconnect()
-	    return total      
+        return total      
 
     def getFolderList(self):
         '''
@@ -79,9 +84,9 @@ class ImapBox(inbox.Inbox):
             self.server = imaplib.IMAP4_SSL(self._account.data['in_server'], int(self._account.data['in_port']))
         else:
             self.server = imaplib.IMAP4(self._account.data['in_server'], int(self._account.data['in_port']))
-	
-    def login(self, email=None, password):
-	    if not email:
+    
+    def login(self, password, email=None):
+        if not email:
             email = self._account.data["email"]
-	    self.server.login(email, password)
-	    
+        self.server.login(email, password)
+        

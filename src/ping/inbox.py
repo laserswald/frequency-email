@@ -6,7 +6,6 @@ Created on Jul 12, 2011
 
 import mailbox
 
-
 class Inbox(mailbox.Maildir):
     """
     This class represents a maildir mailbox with convenience functions for getting mail.
@@ -30,13 +29,4 @@ class Inbox(mailbox.Maildir):
     def setup_server(self):
         print 'Overload this'
         
-    @classmethod
-    def get_inbox(self, account, gui):
-        '''
-        gets the correct inbox type when called.
-        '''
-        if account.data['type'] == 'POP':
-            inbox = PopBox(account, gui)
-        if account.data['type'] == 'IMAP':
-            inbox = ImapBox(account, gui)
-        return inbox
+
