@@ -25,14 +25,16 @@ from PIL import Image, ImageTk
 import os
 import dialogs
 from widget.ToolFrame import *
-
+from widget import mailboxList 
 
 class MainWindow(object):
 
-    def __init__(self, logic):
-        self.logic = logic
-
-
+    def __init__(self, accountmgr):
+        self.accountmgr = accountmgr
+        self.master = Tk()
+        self.setup_widgets()
+        self.dialogs = dialogs.DialogManager(self.master)
+    
     def setup_widgets (self):
         """Sets up all the user interface in the main window.
         """
@@ -40,7 +42,6 @@ class MainWindow(object):
         self.master.title("Email")
         if os.name == "nt":
             self.master.iconbitmap("./icons/Frequency.ico")
-        self.dialogs = dialogs.DialogManager(self.master)
 
         
         self.master.grid_rowconfigure(1, weight = 1)
@@ -50,14 +51,8 @@ class MainWindow(object):
         self.setup_tools()
         self.panes = PanedWindow(self.master, orient = HORIZONTAL)
         #TODO Finish the mailbox tree subclass of Treeview.
-        self.mailboxTree = Treeview(self.panes,
-                                    show = 'tree headings')
-
-        #self.mailboxTree.bind("<<TreeviewSelect>>", self.box_selected)
-
-
-
-        self.panes.add(self.mailboxTree)
+        self.mailboxview = mailboxList.MailBoxView(self.master);
+        self.panes.add(self.mailboxview)
         self.rightpanes = PanedWindow(self.master, orient = VERTICAL)
         self.messageColumns = ('Subject',
                             'From',
@@ -83,14 +78,14 @@ class MainWindow(object):
         self.fileMenu = Menu(self.mainMenu)
         
         self.newMenu = Menu(self.fileMenu)
-        self.newMenu.add_command(label = "Message", command = self.logic.new_message)
+        self.newMenu.add_command(label = "Message", command = self.new_message)
         self.fileMenu.add_cascade(label = "New", menu = self.newMenu)
         self.fileMenu.add_command(label = "Send/Recieve",  compound = LEFT)
-        self.fileMenu.add_command(label = 'Options', command = self.logic.options)
-        self.fileMenu.add_command(label = "Exit", command = self.logic.quit)
+        self.fileMenu.add_command(label = 'Options', command = self.options)
+        self.fileMenu.add_command(label = "Exit", command = self.quit)
         
         self.mainMenu.add_cascade(label = "File", menu = self.fileMenu)
-        
+
         self.master.config(menu = self.mainMenu)
         
     def setup_tools(self):
@@ -98,19 +93,7 @@ class MainWindow(object):
         button = ToolImageButton(self.toolbar, label = "Send/Recieve", image = self.wrench_icon);
         self.toolbar.insert(button)
         self.toolbar.grid(row=0, column=0, sticky = N+S+E+W)
-
-
-    def message_selected(self, event):
-        item = self.messageList.selection()
-        index = int(item[0].strip('I'))-1
-        key = self.messageKeys[index]
-        displayedMessage = self.inboxes.get_message(key)
-        self.mView = messageView.MessageView(self.master)
-        self.mView.load_from_message(displayedMessage)
-
-
-
-            
+           
     def setup_icons(self):
         print os.getcwd()
         #self.email_icon = ImageTk.PhotoImage(Image.open('./icons/email.png'))
@@ -125,10 +108,20 @@ class MainWindow(object):
 
     def quit(self):
         self.master.quit()
-            
+    
+    def new_message(self):
+        pass
+
+    def message_selected(self):
+        pass
+
+    def populate(self):
+        self.account
+
+    def options(self):
+        pass
+
     def start(self):
-        self.master = Tk()
-        self.setup_widgets()
         self.master.mainloop()
         return self
         

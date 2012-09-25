@@ -39,8 +39,8 @@ class EmailAccountManager(manager.AccountManager):
 			
 		popup = self.gui.dialogs.new_account()
 		accountDefs = {'email': popup.email, 'type': popup.type, 'in_server': popup.server, 'in_port': popup.port, 'out_server': popup.smtp_server, 'out_port': popup.smtp_port}
-		#TODO : Fix this rubbish so that the account dialog returns a dict
-		askname= self.gui.dialogs.askString("Account", "Please give a name to the account.")
+		
+        askname= self.gui.dialogs.askString("Account", "Please give a name to the account.")
 		mboxdir =  os.path.splitext(askname)[0] + "Mail"
 		self.currentAccount = account.Account(self)
 		self.currentAccount.add_item('name', askname)

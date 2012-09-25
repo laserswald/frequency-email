@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 '''
 Created on Jan 30, 2011
 
@@ -246,4 +247,3 @@ class DialogManager(object):
 		Proxy for Tk error box.
 		'''
 		tkMessageBox.showerror(title, text)
-	

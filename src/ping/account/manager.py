@@ -38,7 +38,7 @@ class AccountManager(object):
 		
 	def read_configuration (self):
 		""" Reads the configuration file and performs filechecks. """
-		self.config.read(self._configfile)
+		self.config.read(self.configfile)
 
 	def setup_config (self):
 		""" Function doc """
@@ -75,7 +75,7 @@ class AccountManager(object):
 		self.config.add_section(account.data['name'])
 		for field in account.data:
 			self.config.set(account.data['name'], field, str(account.data[field]))
-		self.config.write(open(self.configFile, 'w'))
+		self.config.write(open(self.configfile, 'w'))
 
 	def load_account(self, section):
 		'''
