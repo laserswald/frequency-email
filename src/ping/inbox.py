@@ -13,20 +13,18 @@ class Inbox(mailbox.Maildir):
     total = 0
     loaded = 0
 
-    def __init__(self, account, gui):
+    def __init__(self, account):
         """
         Constructor.
 
         account -- An account to bind this mailbox to.
         """
         self._account = account
-        mailbox.Maildir.__init__(self, self._account.data['mboxdir'], factory = mailbox.MaildirMessage)
+        mailbox.Maildir.__init__(self, self._account.name, factory=mailbox.MaildirMessage)
 
-        self.type = self._account.data['type']
+        self.type = self._account.type
         self.setup_server()
 
 
     def setup_server(self):
         print 'Overload this'
-        
-

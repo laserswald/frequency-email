@@ -5,11 +5,10 @@ Created on Jan 17, 2011
 '''
 from Tkinter import *
 from ttk import *
-import gui.widget.browser
-import gui.composer
-import gui.widget.ToolFrame
+import widget.browser
 
-class MessageView(gui.composer.Composer):
+
+class MessageView(Toplevel):
     '''
     An HTML viewer for a message.
     '''
@@ -19,7 +18,7 @@ class MessageView(gui.composer.Composer):
         Constructor
         '''
         Toplevel.__init__(self, master)
-        self.view = browser.Browser(self)
+        self.view = widget.browser.Browser(self)
         self.view.pack(fill=BOTH, expand=1)
     
     def load_from_message(self, message):

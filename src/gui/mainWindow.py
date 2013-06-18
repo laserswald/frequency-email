@@ -24,51 +24,55 @@ import tkMessageBox
 from PIL import Image, ImageTk
 import os
 import dialogs
+import widget.mailboxList
+import widget.messagelist
+import messageView
 from widget.ToolFrame import *
-from widget import mailboxList 
+import ping.account.manager
 
 class MainWindow(object):
 
-    def __init__(self, accountmgr):
-        self.accountmgr = accountmgr
+    def __init__(self):
         self.master = Tk()
-        self.setup_widgets()
         self.dialogs = dialogs.DialogManager(self.master)
-    
+        self.accounts = ping.account.manager.AccountManager(self)
+        self.setup_widgets()
+        
+        
+    def start(self):
+        password = self.dialogs.askPassword()
+        self.accounts.currentAccount.inbox.login(password)
+        self.update_folders()
+        self.get_mail()
+        self.master.mainloop()
+
     def setup_widgets (self):
         """Sets up all the user interface in the main window.
         """
         
-        self.master.title("Email")
+        self.master.title("Frequency")
         if os.name == "nt":
-            self.master.iconbitmap("./icons/Frequency.ico")
-
-        
+           self.master.iconbitmap("icons/Frequency.ico")
+        self.dialogs = dialogs.DialogManager(self.master)
         self.master.grid_rowconfigure(1, weight = 1)
         self.master.grid_columnconfigure(0, weight = 1)
         self.setup_icons()
         self.setup_menus()
         self.setup_tools()
         self.panes = PanedWindow(self.master, orient = HORIZONTAL)
+
         #TODO Finish the mailbox tree subclass of Treeview.
-        self.mailboxview = mailboxList.MailBoxView(self.master);
-        self.panes.add(self.mailboxview)
+        self.mailboxTree = widget.mailboxList.MailboxView(self.master, self.accounts, self)
+        self.panes.add(self.mailboxTree)
+
         self.rightpanes = PanedWindow(self.master, orient = VERTICAL)
-        self.messageColumns = ('Subject',
-                            'From',
-                            'To',
-                            'Date')
-        self.messageList = Treeview(self.master,
-                                    columns = self.messageColumns,
-                                    show = 'headings')
-        for heading in self.messageColumns:
-            self.messageList.heading(heading, text = heading)
-        self.messageList.bind("<<TreeviewSelect>>", self.message_selected)
+        
 
-
+        self.messageList = widget.messagelist.MessageList(self.master, self.accounts, self)
+        
+        
         self.rightpanes.add(self.messageList)
         self.panes.add(self.rightpanes)
-        #self.messageLis
         self.panes.grid(row = 1, column = 0, sticky = N+S+E+W)
         #self.status.set("Welcome to Frequency!")
         
@@ -90,41 +94,46 @@ class MainWindow(object):
         
     def setup_tools(self):
         self.toolbar = ToolFrame(self.master)
-        button = ToolImageButton(self.toolbar, label = "Send/Recieve", image = self.wrench_icon);
+        button = ToolImageButton(self.toolbar, label = "Send/Recieve", image = self.email_icon);
         self.toolbar.insert(button)
         self.toolbar.grid(row=0, column=0, sticky = N+S+E+W)
-           
     def setup_icons(self):
-        print os.getcwd()
-        #self.email_icon = ImageTk.PhotoImage(Image.open('./icons/email.png'))
+        self.email_icon = ImageTk.PhotoImage(Image.open('icons/email.png'))
         #self.email_add_icon = ImageTk.PhotoImage(Image.open('./icons/email_add.png'))
         #self.email_delete_icon = ImageTk.PhotoImage(Image.open('./icons/email_delete.png'))
         #self.email_attach_icon = ImageTk.PhotoImage(Image.open('./icons/email_attach.png'))
         #self.email_edit_icon = ImageTk.PhotoImage(Image.open('./icons/email_edit.png'))
         #self.door_in_icon =  ImageTk.PhotoImage(Image.open('./icons/door_out.png'))
         #self.user_add_icon = ImageTk.PhotoImage(Image.open('./icons/user_add.png'))
-
-        self.wrench_icon = ImageTk.PhotoImage(Image.open("./icons/wrench.png"))
+        self.wrench_icon = ImageTk.PhotoImage(Image.open("icons/wrench.png"))
 
     def quit(self):
         self.master.quit()
-    
-    def new_message(self):
-        pass
-
-    def message_selected(self):
-        pass
-
-    def populate(self):
-        self.account
-
+            
     def options(self):
         pass
 
-    def start(self):
-        self.master.mainloop()
-        return self
-        
+    def new_message(self):
+        pass
+
+    def switch_accounts(self, thingy):
+        pass
+    
+    def show_message(self, messagekey):
+        view = messageView.MessageView(self.master)
+        view.load_from_message(self.accounts.currentAccount.inbox.get_message(messagekey))
+
+    def get_mail(self):
+        # make this get all mail
+        self.accounts.currentAccount.inbox.retrieve_mail()
+       
+    def box_selection(self, mailbox):
+        self.messageList.show_mailbox(mailbox)
+
+    def update_folders(self):
+        folders = self.accounts.currentAccount.inbox.get_folders()
+        self.mailboxTree.load_mailboxes(folders)
+
 if __name__ == "__main__":
     mw = MainWindow(None)
     mw.start()
