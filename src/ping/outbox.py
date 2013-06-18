@@ -44,7 +44,7 @@ class Outbox:
         """
         self.queue.append(message)
 
-    def send_all (self, password):
+    def send (self, password):
         """ sends all the messages """
         self.connect(secure = True)
         self.login(password)
@@ -52,13 +52,6 @@ class Outbox:
             self.send_msg(self.queue.pop())
         self.close()
         
-    def send(self, message, password):
-        """Sends a single message."""
-        self.connect(secure = True)
-        self.login(password)
-        self.send_msg(message)
-        self.close()
-
 
     def send_msg(self, message):
         self.server.sendmail(self.account.email, message['to'], message.as_string())
@@ -68,7 +61,6 @@ class Outbox:
         self.server.starttls()
         self.server.ehlo()
         self.server.login(self.account.email, password)
-        
         
     def connect(self, secure = False):
         if secure: 

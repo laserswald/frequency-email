@@ -65,7 +65,6 @@ class Composer(Toplevel):
 		self.addressBox = Listbox(self)
 		self.addressBox.pack(side=TOP, fill=X)
 
-
 		self.subjectBox = Entry(self)
 		self.subjectBox.pack(side=TOP, fill=X)
 

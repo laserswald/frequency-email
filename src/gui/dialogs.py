@@ -9,6 +9,8 @@ import tkMessageBox
 import tkSimpleDialog
 import tkFileDialog
 import os
+import wizard
+import ping.account.account
 
 class Dialog(Toplevel):
 
@@ -98,7 +100,7 @@ class Dialog(Toplevel):
 
 		return 1 # override
 
-	def apply(self):
+	def finish(self):
 
 		pass # override
 
@@ -115,17 +117,20 @@ class AccountFrame(Frame):
 		self.control = StringVar()
 		
 		emailframe = Frame(self)
-		Label(emailframe, text="Email Address:").pack(side=LEFT)
+		Label(emailframe, text="Email:").pack(side=LEFT)
 		self.email = Entry(emailframe)
+		self.accountname = Entry(emailframe)
 		self.email.pack(side=LEFT)
+		self.accountname.pack()
+
 		emailframe.pack(fill = X)
 		
 		inmailFrame = LabelFrame(self, text = "Incoming Server")
 		
 		intypeframe = Frame(inmailFrame)
 		Label(intypeframe, text = "Incoming mail type:").pack(side=LEFT)
-		self.r1 = Radiobutton(intypeframe, text = 'POP', variable = self.control, value = "POP",)
-		self.r2 = Radiobutton(intypeframe, text = 'IMAP', variable = self.control, value = "IMAP",)
+		self.r1 = Radiobutton(intypeframe, text = 'POP', variable = self.control, value = "POP")
+		self.r2 = Radiobutton(intypeframe, text = 'IMAP', variable = self.control, value = "IMAP")
 		self.r1.pack(side=LEFT)
 		self.r2.pack(side=LEFT)
 		intypeframe.pack(fill = X)
@@ -159,6 +164,17 @@ class AccountFrame(Frame):
 		sportFrame.pack()
 		
 		smtpFrame.pack()
+
+	def makeAccount(self):
+		name = self.accountname.get()
+		email = self.email.get()
+		inserver = self.inserver.get()
+		inport = self.inport.get()
+		outserver = self.sserver.get()
+		outport = self.sport.get()
+		account = ping.account.account.EmailAccount(name, None, email, "IMAP", inserver, inport, outserver, outport)
+		return account
+
 		
 class OptionsDialog(Dialog):
 	
@@ -173,17 +189,8 @@ class OptionsDialog(Dialog):
 		'''
 		Apply the items in the dialog.	
 		'''
-		self.email = self.accountFrame.email.get()
-		self.type = self.accountFrame.control.get()
-		print self.type
-		self.server = self.accountFrame.inserver.get()
-		self.port = self.accountFrame.inport.get()
-		self.smtp_server = self.accountFrame.sserver.get()
-		self.smtp_port = self.accountFrame.sport.get()
+		self.account = self.accountFrame.makeAccount()
 	
-
-
-
 class WelcomeDialog(Dialog):
 	"""
 	Class Documentation
@@ -194,8 +201,7 @@ class WelcomeDialog(Dialog):
 		class initializer
 		'''
 		pass
-
-		
+	
 class DialogManager(object):
 	'''
 	Class Documentation
@@ -225,7 +231,8 @@ class DialogManager(object):
 		Opens the settings dialog.
 		'''
 		settings = OptionsDialog(self.master)
-		return settings
+		
+		return settings.account
 	
 	def savefile(self, title):
 		'''
@@ -246,4 +253,9 @@ class DialogManager(object):
 		Proxy for Tk error box.
 		'''
 		tkMessageBox.showerror(title, text)
-	
+
+	def new_account(self):
+		wizard = NewAccountWizard()
+		wizard.run()
+		account = wizard.get_account()
+		return account

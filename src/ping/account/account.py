@@ -1,23 +1,27 @@
 #!/usr/bin/env python
 # An account managing system.
 
-class Account(object):
-	""" An individual account for things. Not to be used by itself, please. """
-	data = {}
-	def __init__ (self, manager):
+import ping.boxfactory
+import ping.outbox
+
+class EmailAccount(object):
+	""" An individual email account. """
+
+
+	def __init__ (self, name, username, email, _type, in_server, in_port, out_server, out_port):
 		""" Class initialiser.
-		
-		manager - an Account Manager to accociate with.
 		"""
-		self.manager = manager
+		self.name = name
+		if (username == None): self.username = "none"
+		else: self.username = username
+		self.email = email
+		self.type = _type
+		self.in_server = in_server
+		self.in_port = in_port
+		self.out_server = out_server
+		self.out_port = out_port
 
-	
-	def add_item (self, key, value):
-		self.data[key] = value
-		
-	def remove_item(self, key):
-		self.data.remove(key)
-	
-	def get_item(self, key):
-		return self.data[key]
-
+		print "Making inbox"
+		self.inbox = ping.boxfactory.get_inbox(self)
+		print "Making outbox"
+		self.outbox = ping.outbox.Outbox(self)

@@ -1,16 +1,19 @@
 from Tkinter import *
 from ttk import *
 
-class MailBoxView(Treeview):
+class MailboxView(Treeview):
 	"""
 	Class Documentation
 	"""
 	
-	def __init__(self):
+	def __init__(self, master, accounts, reciever):
 		'''
 		class initializer
 		'''
-		pass
+		Treeview.__init__(self, master)
+		self.accounts = accounts
+		self.reciever = reciever
+		self.bind("<<TreeviewSelect>>", self.box_selected)
 		
 	def add_account_tree(self, accountname, folders = None):
 		'''
@@ -27,48 +30,9 @@ class MailBoxView(Treeview):
 				folder = ''; mailbox = hie[0]
 			self.insert(folder, 'end', mailbox, text=mailbox)
 
-	
+	# TODO: split this up into helper functions.
 	def box_selected(self, event):
-		self.messageKeys = []
+
 		boxname = event.widget.selection()[0]
-		while True:
-			try:
-				self.selectedBox = self.inboxes.get_folder(boxname)
-				break
-			except:
-				self.inboxes.add_folder(boxname)
-		try:
-			self.set_children('')
-		except:
-			print 'no items'
-		for key, message in self.selectedBox.iteritems():
-			treevalues = (message['Subject'],
-						message['From'],
-						message['Date'])
-			self.insert('', 'end', values=treevalues)
-			self.messageKeys.append(key)
+		self.reciever.box_selection(boxname)
 
-	def sortby(self, tree, col, descending):
-		"""Sort tree contents when a column is clicked on."""
-		# grab values to sort
-		data = [(tree.set(child, col), child) for child in tree.get_children('')]
-		if col == 'Date':
-			newData = []
-			for index, item in enumerate(data):
-				date = item[0]
-				dataitem = (rfc822.parsedate(date), index, item)
-				newData.append(dataitem)
-
-			newData.sort(reverse=descending)
-			for set in enumerate(newData):
-				print set
-				parsedate, indx, item = set
-				tree.move(item[1], '', indx)
-		# reorder data
-		data.sort(reverse=descending)
-		for indx, item in enumerate(data):
-			tree.move(item[1], '', indx)
-
-		# switch the heading so that it will sort in the opposite direction
-		tree.heading(col,
-			command=lambda col=col: self.sortby(tree, col, int(not descending)))

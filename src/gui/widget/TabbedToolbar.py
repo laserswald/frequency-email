@@ -79,7 +79,7 @@ class MainButton(Menubutton):
 		'''
 		Sets the text for the MainButton.
 		'''
-		self.icon = image
+		self.text = text
 		self.reconfigure()
 		
 	def set_compound(self, compound):
